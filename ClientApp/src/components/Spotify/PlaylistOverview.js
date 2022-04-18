@@ -4,9 +4,6 @@ import '../Template.css';
 import PlaylistLink from './PlaylistLink';
 import './Style.css';
 
-import Track from './Track';
-
-
 export default class PlaylistOverview extends React.Component {
 
     constructor(props) {
