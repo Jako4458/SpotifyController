@@ -6,16 +6,16 @@ import './Style.css';
 
 export default class Track extends React.Component {
 
-    constructor(props) {
-        super(props);
-        //this.state = {loading: true };
-    }
+    //constructor(props) {
+    //    super(props);
+    //    //this.state = {loading: true };
+    //}
 
     render() {
         return (
             <React.Fragment>
                 <div className="track" id={this.props.id}>
-                    <img src={this.props.album.images[2].url} />
+                    <img src={this.props.album.images[2].url} alt="album cover" />
                     <p id="name">{this.props.name}</p>
                     {this.RenderIfWidthIsOver(800, <p id="album">{this.props.album.name}</p>)}
                     {this.RenderIfWidthIsOver(800, <p id="artist">{this.props.album.artists.map(element => element.name)}</p>)}
