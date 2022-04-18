@@ -144,7 +144,16 @@ namespace SpotifyController.Services
             if (!response.IsSuccessStatusCode)
                 return (false, default, resContent);
 
-            return (true, JsonConvert.DeserializeObject<T>(resContent), resContent);
+            try
+            {
+                return (true, JsonConvert.DeserializeObject<T>(resContent), resContent);
+            }
+            catch (JsonReaderException e)
+            {
+                // for debugging - raw content will still be returned when json deserialization fails
+                Console.WriteLine(e);
+                return (true, default, resContent);
+            }
             //return (true, default, resContent);
         }
 
