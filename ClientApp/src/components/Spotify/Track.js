@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Cookies from 'universal-cookie';
 
 import '../Template.css';
 import './Style.css';
@@ -30,7 +31,8 @@ export default class Track extends React.Component {
         const response = await fetch(`API/SpotifyAPI/QueueTrack?trackId=${this.props.id}`,{
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'SessionId': new Cookies().get("SessionId"),
             },
             body: JSON.stringify({"trackId": trackId}),
         });

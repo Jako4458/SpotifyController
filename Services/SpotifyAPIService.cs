@@ -37,9 +37,9 @@ namespace SpotifyController.Services
         private readonly string _clientSecret;
 
         // ShowDialog should be true for final/publish build
-        public string AuthorizeUser(string redirect_uri="/", bool showDialog = false)
+        public string AuthorizeUser(string session_id, string redirect_uri="/", bool showDialog = false)
         {
-            string state = redirect_uri;
+            string state = $"session_id={session_id};redirect_uri={redirect_uri}";
             List<string> authScopes = new List<string>()
             {
                 "user-read-recently-played",

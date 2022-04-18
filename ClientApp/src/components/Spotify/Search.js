@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Cookies from 'universal-cookie';
 
 import '../Template.css';
 import './Style.css';
@@ -23,7 +24,7 @@ export default class Search extends React.Component {
     }
 
     render() {
-        let content = this.state.search_result == null && this.state.value == "" ? "" :
+        let content = this.state.value == "" ? "" :
             this.state.search_result == null
             ? <p>Loading ...</p>
             : this.state.search_result.tracks.items.map(element => {
@@ -62,7 +63,14 @@ export default class Search extends React.Component {
     }
 
     async search(query) {
-        const response = await fetch(`API/SpotifyAPI/Search?query=${query}`)
+        let sessionId = new Cookies().get("SessionId");
+
+        const response = await fetch(`API/SpotifyAPI/Search?query=${query}`,
+            {
+                headers: {
+                'SessionId': sessionId,
+                }
+            })
         if (response.ok) {
             try {
                 const data = await response.json();
@@ -71,7 +79,7 @@ export default class Search extends React.Component {
                 this.setState({ search_result: { name: "Error: Response is not JSON!" }, loading: false });
             }
         } else if (response.status == 401) {
-            window.location.href = `API/SpotifyAPI/authorize?redirect_uri=/search/${this.state.value}`
+            window.location.href = `API/SpotifyAPI/authorize?session_id=${sessionId}&redirect_uri=/search/${this.state.value}`
         } else {
             this.setState({ search_result: {tracks:{ name: `Error: ${response.status}: ${response.body}` }}, loading: false });
         }
