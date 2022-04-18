@@ -22,7 +22,10 @@ namespace SpotifyController.Controllers
             if (error == null && code != null) { }
                 UserRepo.TestUser.spotifyAPIData = new APIData(code, state);
     
-            return Redirect("/API/SpotifyAPI/AccessToken");
+            if (state != null)
+                return Redirect($"/API/SpotifyAPI/AccessToken?redirect_uri={state}");
+
+            return Redirect($"/API/SpotifyAPI/AccessToken");
         }
     }
 }

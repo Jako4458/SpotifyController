@@ -11,7 +11,7 @@ namespace SpotifyController.Interfaces
     interface ISpotifyAPIService
     {
 
-        string AuthorizeUser(bool showDialog);
+        string AuthorizeUser(string redirect_uri, bool showDialog);
         Task<(bool, string)> GetToken(User user);
         Task<(bool, Playlist, string)> GetPlaylist(User user, string playlistId);
         Task<(bool, Playlists, string)> GetCurrentUsersPlaylists(User user);

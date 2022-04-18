@@ -9,15 +9,21 @@ export default class Search extends React.Component {
 
     constructor(props) {
         super(props);
+        let query = this.props.match.params.query;
+        query = query ? query : "";
+
         this.state = {
-            value: "", search_result: null, loading: true };
+            value: query, search_result: null, loading: true };
 
         this.updateInput = this.updateInput.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        if (query)
+            this.search(query);
     }
 
     render() {
-        let content = this.state.value == "" ? "" :
+        let content = this.state.search_result == null && this.state.value == "" ? "" :
             this.state.search_result == null
             ? <p>Loading ...</p>
             : this.state.search_result.tracks.items.map(element => {
@@ -30,7 +36,7 @@ export default class Search extends React.Component {
                 <div className="search">
                     <form onSubmit={this.handleSubmit}>
                         <label>
-                            <input type="text" onChange={this.updateInput} />
+                            <input type="text" value={this.state.value} onChange={this.updateInput} />
                         </label>
                         <input type="submit" value="Search"/>
                     </form>
@@ -65,7 +71,7 @@ export default class Search extends React.Component {
                 this.setState({ search_result: { name: "Error: Response is not JSON!" }, loading: false });
             }
         } else if (response.status == 401) {
-            window.location.href = "API/SpotifyAPI/authorize"
+            window.location.href = `API/SpotifyAPI/authorize?redirect_uri=/search/${this.state.value}`
         } else {
             this.setState({ search_result: {tracks:{ name: `Error: ${response.status}: ${response.body}` }}, loading: false });
         }

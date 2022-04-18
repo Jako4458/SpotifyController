@@ -24,7 +24,7 @@ export default () => (
         <Content>
             <Route exact path='/' component={Home} />
             <Route exact path='/playlists' component={PlaylistOverview} />
-            <Route exact path='/search' component={Search} />
+            <Route exact path='/search/:query?' component={Search} />
             <Route path='/playlist/:id' component={Playlist} />
             <Route path='/playlistlink/:id' component={PlaylistLink} />
         </Content>
