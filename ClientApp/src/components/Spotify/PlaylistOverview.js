@@ -49,7 +49,7 @@ export default class PlaylistOverview extends React.Component {
                 this.setState({ playlists: { name: "Error: Response is not JSON!" }, loading: false });
             }
         } else if (response.status == 401) {
-            window.location.href = "API/SpotifyAPI/authorize"
+            window.location.href = "API/SpotifyAPI/authorize?redirect_uri=/playlists"
         } else {
             this.setState({ playlists: { name: `Error: ${response.status}: ${response.body}` }, loading: false });
         }

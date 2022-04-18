@@ -22,13 +22,13 @@ namespace LogenV2React.Controllers
         }
 
         [HttpGet]
-        public IActionResult Authorize()
+        public IActionResult Authorize([FromQuery] string redirect_uri="/")
         {
-            return Redirect(_spotifyAPIService.AuthorizeUser());
+            return Redirect(_spotifyAPIService.AuthorizeUser(redirect_uri));
         }
 
         [HttpGet]
-        public async Task<IActionResult> AccessToken()
+        public async Task<IActionResult> AccessToken([FromQuery] string redirect_uri="/")
         {
             User user = UserRepo.TestUser;
 
@@ -43,11 +43,11 @@ namespace LogenV2React.Controllers
                 return Redirect("/API/SpotifyAPI/Authorize");
             }
 
-            return Redirect("/");
+            return Redirect(redirect_uri);
         }
         
         [HttpPost]
-        public async Task<IActionResult> QueueTrack([FromQuery] string trackId)
+        public async Task<IActionResult> QueueTrack([FromQuery] string trackId, [FromQuery] bool raw=false)
         {
             if (trackId == null)
                 return NotFound("No trackId supplied!");
@@ -67,12 +67,14 @@ namespace LogenV2React.Controllers
 
             if (!succesfullyAdded)
                 return NotFound("Song could not be added to queue!");
+            if (raw)
+                return Ok(responseContent);
 
             return Ok("Song succesfully added to queue!");
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetPlaylists()
+        public async Task<IActionResult> GetPlaylists([FromQuery] bool raw=false)
         {
             User user = UserRepo.TestUser;
             
@@ -83,7 +85,6 @@ namespace LogenV2React.Controllers
             try
             {
                 (succesfullyAdded, playlists, responseContent) = await _spotifyAPIService.GetCurrentUsersPlaylists(user);
-                //(succesfullyAdded, playlists, responseContent) = await _spotifyAPIService.GetCurrentUsersPlaylists(user);
             }
             catch (SpotifyNotConnectedException)
             {
@@ -92,13 +93,14 @@ namespace LogenV2React.Controllers
 
             if (!succesfullyAdded)
                 return NotFound("Playlists could not be found!");
+            if (raw)
+                return Ok(responseContent);
 
             return Ok(playlists);
-            //return Ok(responseContent);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPlaylist([FromQuery] string playlistId)
+        public async Task<IActionResult> GetPlaylist([FromQuery] string playlistId, [FromQuery] bool raw = false)
         {
             if (playlistId == null)
                 return NotFound("No playlistId supplied!");
@@ -120,11 +122,13 @@ namespace LogenV2React.Controllers
 
             if (!succesfullyAdded)
                 return NotFound("Playlist could not be found!");
-
+            if (raw) 
+                return Ok(responseContent);
+            
             return Ok(playlist);
         }
 
-        public async Task<IActionResult> Search([FromQuery] string query)
+        public async Task<IActionResult> Search([FromQuery] string query, [FromQuery] bool raw = false)
         {
             if (query == null)
                 return NotFound("No search query found");
@@ -146,9 +150,10 @@ namespace LogenV2React.Controllers
 
             if (!succesfullyAdded)
                 return NotFound("Search failed!");
-
+            if (raw)
+                return Ok(responseContent);
+            
             return Ok(searchResult);
-            return Ok(responseContent);
         }
 
     }

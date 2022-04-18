@@ -30,15 +30,16 @@ namespace SpotifyController.Services
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = "https://api.spotify.com/v1";
 
-        public static string RedirectUri = "https://localhost/api/user/authorizeSpotify";
+        public static string RedirectUri= "https://localhost/api/user/authorizeSpotify";
 
 
         private readonly string _clientId;
         private readonly string _clientSecret;
 
         // ShowDialog should be true for final/publish build
-        public string AuthorizeUser(bool showDialog = false)
+        public string AuthorizeUser(string redirect_uri="/", bool showDialog = false)
         {
+            string state = redirect_uri;
             List<string> authScopes = new List<string>()
             {
                 "user-read-recently-played",
@@ -52,7 +53,8 @@ namespace SpotifyController.Services
             };
 
             string scopesAsString = authScopes.Select(scope => scope == authScopes[authScopes.Count-1] ? scope : $"{scope}%20").Aggregate((acc, scope) => $"{acc}{scope}");
-            string authPath = $"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type=code&redirect_uri={RedirectUri}&scope={scopesAsString}&show_dialog={showDialog}";
+            //string authPath = $"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type=code&redirect_uri={RedirectUri}&scope={scopesAsString}&show_dialog={showDialog}";
+            string authPath = $"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type=code&redirect_uri={RedirectUri}&scope={scopesAsString}&show_dialog={showDialog}&state={state}";
 
             return authPath;
         }
@@ -144,7 +146,15 @@ namespace SpotifyController.Services
             if (!response.IsSuccessStatusCode)
                 return (false, default, resContent);
 
-            return (true, JsonConvert.DeserializeObject<T>(resContent), resContent);
+            try
+            {
+                return (true, JsonConvert.DeserializeObject<T>(resContent), resContent);
+            }
+            catch (JsonReaderException e)
+            {
+                // for debugging - raw content will still be returned when json deserialization fails
+                return (true, default, resContent);
+            }
             //return (true, default, resContent);
         }
 
