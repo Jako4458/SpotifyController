@@ -8,13 +8,12 @@ import Layout from './components/Layout';
 import './custom.css'
 import Content from './components/Content';
 
-import Track from './components/Spotify/Track';
 import Playlist from './components/Spotify/Playlist';
 import PlaylistLink from './components/Spotify/PlaylistLink';
 import PlaylistOverview from './components/Spotify/PlaylistOverview';
 import Search from './components/Spotify/Search';
 
-export default () => ( 
+export default () => (
     <Layout Title="Spotify">
 
         {RenderIfWidthIsOver(
@@ -27,6 +26,7 @@ export default () => (
             <Route exact path='/search/:query?' component={Search} />
             <Route path='/playlist/:id' component={Playlist} />
             <Route path='/playlistlink/:id' component={PlaylistLink} />
+            {/*<Route path='/session/:id' component={PlaylistLink} />*/}
         </Content>
 
         {RenderIfWidthIsOver(
