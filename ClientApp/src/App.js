@@ -23,10 +23,11 @@ export default () => (
         <Content>
             <Route exact path='/' component={Home} />
             <Route exact path='/playlists' component={PlaylistOverview} />
-            <Route exact path='/search/:query?' component={Search} />
+            {<Route exact path='/search/:query?' component={Search} />}
             <Route path='/playlist/:id' component={Playlist} />
             <Route path='/playlistlink/:id' component={PlaylistLink} />
-            {/*<Route path='/session/:id' component={PlaylistLink} />*/}
+            {/*{<Route path='/session' component={PlaylistLink} />}*/}
+            {<Route exact path='/session/:sessionId/search/:query?' component={Search} />}
         </Content>
 
         {RenderIfWidthIsOver(

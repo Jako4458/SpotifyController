@@ -13,6 +13,10 @@ export default class Search extends React.Component {
         let query = this.props.match.params.query;
         query = query ? query : "";
 
+        let session = this.props.match.params.sessionId;
+        this.session = session ? session : "";
+
+
         this.state = {
             value: query, search_result: null, loading: true };
 
@@ -69,6 +73,7 @@ export default class Search extends React.Component {
             {
                 headers: {
                 'SessionId': sessionId,
+                'SpotifySessionId': this.session,
                 }
             })
         if (response.ok) {
