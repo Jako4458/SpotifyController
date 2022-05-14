@@ -5,14 +5,23 @@ using System.Threading.Tasks;
 
 namespace SpotifyController.Model
 {
-    public class ShareSession
+    public class SpotifySession
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public User User { get; set; }
+
+        public SpotifyAPIToken SpotifyToken { get; set; }
+
         public DateTime EndTime { get; set; }
-        public bool IsPublic { get; set; }
-        public string? Password { get; set; }
+
+        public bool IsPublic => (DateTime.Now < EndTime);
+
+        private string _password;
+        public string? Password {
+            get { return IsPublic ? _password : null; }
+            set { _password = value; }
+        }
+
         public string Url { get; set; }
         
     }

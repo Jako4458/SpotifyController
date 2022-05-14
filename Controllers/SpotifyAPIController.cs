@@ -37,7 +37,7 @@ namespace LogenV2React.Controllers
             
             try
             {
-                (bool succes, string tokenContent) = await _spotifyAPIService.GetToken(user);
+                (bool succes, string tokenContent) = await _spotifyAPIService.GetToken(user.SpotifySession);
                 if (!succes)
                     return NotFound($"Could not get Token for user - Token response: {tokenContent}");
             }
@@ -50,23 +50,39 @@ namespace LogenV2React.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> QueueTrack([FromHeader] string SessionId, [FromQuery] string trackId, [FromQuery] bool raw=false)
+        public async Task<IActionResult> QueueTrack([FromHeader] string SessionId, [FromQuery] string SpotifySessionId, [FromQuery] string trackId, [FromQuery] bool raw=false)
         {
             if (trackId == null)
                 return NotFound("No trackId supplied!");
 
-            User user;
-            bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+            SpotifySession spotifySession;
+            bool sessionFound;
 
-            if (!userFound)
-                return Unauthorized("Not connected to spotify");
+            (sessionFound, spotifySession) = SpotifySessionRepo.getPublicSpotifySession(SpotifySessionId);
+
+            if (!sessionFound)
+            {
+                User user;
+                bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+
+                if (!userFound)
+                    return Unauthorized("Not connected to spotify");
+                else if (SpotifySessionId is null || user.SpotifySession.Id == SpotifySessionId)
+                {
+                    sessionFound = true;
+                    spotifySession = user.SpotifySession;
+                }
+                else
+                    return Unauthorized("User cannot access the requested session");
+            }
+
 
             bool succesfullyAdded;
             string responseContent;
 
             try
             {
-                (succesfullyAdded, responseContent) = await _spotifyAPIService.QueueTrack(user, trackId);
+                (succesfullyAdded, responseContent) = await _spotifyAPIService.QueueTrack(spotifySession, trackId);
             }
             catch (SpotifyNotConnectedException)
             {
@@ -96,7 +112,7 @@ namespace LogenV2React.Controllers
 
             try
             {
-                (succesfullyAdded, playlists, responseContent) = await _spotifyAPIService.GetCurrentUsersPlaylists(user);
+                (succesfullyAdded, playlists, responseContent) = await _spotifyAPIService.GetCurrentUsersPlaylists(user.SpotifySession);
             }
             catch (SpotifyNotConnectedException)
             {
@@ -129,7 +145,7 @@ namespace LogenV2React.Controllers
 
             try
             {
-                (succesfullyAdded, playlist, responseContent) = await _spotifyAPIService.GetPlaylist(user, playlistId);
+                (succesfullyAdded, playlist, responseContent) = await _spotifyAPIService.GetPlaylist(user.SpotifySession, playlistId);
             }
             catch (SpotifyNotConnectedException)
             {
@@ -162,7 +178,7 @@ namespace LogenV2React.Controllers
 
             try
             {
-                (succesfullyAdded, searchResult, responseContent) = await _spotifyAPIService.Search(user, query);
+                (succesfullyAdded, searchResult, responseContent) = await _spotifyAPIService.Search(user.SpotifySession, query);
             }
             catch (SpotifyNotConnectedException)
             {

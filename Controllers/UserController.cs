@@ -29,7 +29,13 @@ namespace SpotifyController.Controllers
 
             if (error == null && code != null)
                 UserRepo.Users.Add(session_id, new User() { 
-                    spotifyAPIData = new APIData(code, stateAsQueryString)
+                    SpotifySession = new SpotifySession()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        SpotifyToken = new SpotifyAPIToken(code, stateAsQueryString),
+                        EndTime = DateTime.Now
+                    },
+                    //spotifyAPIData = new SpotifyAPIToken(code, stateAsQueryString)
                 });
                 //UserRepo.TestUser.spotifyAPIData = new APIData(code, stateAsQueryString);
     
@@ -37,6 +43,22 @@ namespace SpotifyController.Controllers
                 return Redirect($"/API/SpotifyAPI/AccessToken?{stateAsQueryString}");
 
             return Redirect($"/API/SpotifyAPI/AccessToken");
+        }
+
+        [HttpGet]
+        public IActionResult ShareSession([FromHeader] string SessionId)
+        {
+            User user;
+            bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+
+            if (!userFound)
+                return NotFound("User Not Found");
+
+            user.SpotifySession.EndTime.AddDays(1);
+
+            SpotifySessionRepo.addPublicSpotifySession(user.SpotifySession);
+            return Ok($"Session '{user.SpotifySession.Id}' is public the next 24 Hours");
+
         }
 
         [HttpGet]

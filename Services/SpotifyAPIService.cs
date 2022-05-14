@@ -59,9 +59,9 @@ namespace SpotifyController.Services
             return authPath;
         }
 
-        public async Task<(bool, string)> GetToken(User user)
+        public async Task<(bool, string)> GetToken(SpotifySession session)
         {
-            if (!user.IsConnectedToSpotify)
+            if (session is null)
                 throw new SpotifyNotConnectedException();
 
 
@@ -70,14 +70,14 @@ namespace SpotifyController.Services
             dict.Add("client_secret", _clientSecret);
             dict.Add("redirect_uri", RedirectUri);
 
-            if (user.spotifyAPIData.RefreshToken != null) 
+            if (session.SpotifyToken.RefreshToken != null) 
             { 
                 dict.Add("grant_type", "refresh_token");
-                dict.Add("refresh_token", user.spotifyAPIData.RefreshToken);
+                dict.Add("refresh_token", session.SpotifyToken.RefreshToken);
             } else
             {
                 dict.Add("grant_type", "authorization_code");
-                dict.Add("code", user.spotifyAPIData.Code);
+                dict.Add("code", session.SpotifyToken.Code);
             }
 
             string url = "https://accounts.spotify.com/api/token";
@@ -91,24 +91,24 @@ namespace SpotifyController.Services
             string resString = await res.Content.ReadAsStringAsync();
             var TokenObject = JsonConvert.DeserializeObject<TokenResponse>(resString);
 
-            user.spotifyAPIData.AccessToken = TokenObject.access_token;
-            user.spotifyAPIData.AccessTokenExpiration = DateTime.Now.AddSeconds(TokenObject.expires_in);
+            session.SpotifyToken.AccessToken = TokenObject.access_token;
+            session.SpotifyToken.AccessTokenExpiration = DateTime.Now.AddSeconds(TokenObject.expires_in);
 
-            if (user.spotifyAPIData.RefreshToken == null)
-                user.spotifyAPIData.RefreshToken = TokenObject.refresh_token;
+            if (session.SpotifyToken.RefreshToken == null)
+                session.SpotifyToken.RefreshToken = TokenObject.refresh_token;
 
             return (true, resContent);
         }
 
-        private async Task<(bool, T, string)> SendAPIRequest<T>(User user, string method, string url, HttpContent content=null)
+        private async Task<(bool, T, string)> SendAPIRequest<T>(SpotifySession session, string method, string url, HttpContent content=null)
         {
-            if (!user.IsConnectedToSpotify)
+            if (session is null)
                 throw new SpotifyNotConnectedException();
 
             // if expired and refresh not succesfull return false
-            if (user.spotifyAPIData.AccessTokenExpiration < DateTime.Now)
+            if (session.SpotifyToken.AccessTokenExpiration < DateTime.Now)
             {
-                (bool succes, string tokenContent) = await GetToken(user);
+                (bool succes, string tokenContent) = await GetToken(session);
                 if (!succes)
                     return (false, default, $"Could not get Token: GetToken respone = '{tokenContent}'");
             }
@@ -134,7 +134,7 @@ namespace SpotifyController.Services
             }
 
             var request = new HttpRequestMessage(requestMethod, $"{_baseUrl}{url}");
-            request.Headers.Add("Authorization", $"Bearer {user.spotifyAPIData.AccessToken}");
+            request.Headers.Add("Authorization", $"Bearer {session.SpotifyToken.AccessToken}");
 
             // if not GET add content/body
             if (requestMethod != HttpMethod.Get)
@@ -160,43 +160,43 @@ namespace SpotifyController.Services
 
         /////////////////////////////////////////////////////////////////
         
-        public async Task<(bool, Playlist, string)> GetPlaylist(User user, string playlistId)
+        public async Task<(bool, Playlist, string)> GetPlaylist(SpotifySession session, string playlistId)
         {
             string url = $"/playlists/{playlistId}";
 
-            var response = await SendAPIRequest<Playlist>(user, "GET", url);
+            var response = await SendAPIRequest<Playlist>(session, "GET", url);
             return response;
         }
         
-        public async Task<(bool, Track, string)> GetTrack(User user, string trackId)
+        public async Task<(bool, Track, string)> GetTrack(SpotifySession session, string trackId)
         {
             string url = $"/tracks/{trackId}";
 
-            var response = await SendAPIRequest<Track>(user, "GET", url);
+            var response = await SendAPIRequest<Track>(session, "GET", url);
             return response;
         }
-        public async Task<(bool, string)> QueueTrack(User user, string trackId)
+        public async Task<(bool, string)> QueueTrack(SpotifySession session, string trackId)
         {
             string url = $"/me/player/queue?uri=spotify%3Atrack%3A{trackId}";
 
-            var response = await SendAPIRequest<string>(user, "POST", url);
+            var response = await SendAPIRequest<string>(session, "POST", url);
             return (response.Item1, response.Item2);
         }
 
-        public async Task<(bool, Search, string)> Search(User user, string query)
+        public async Task<(bool, Search, string)> Search(SpotifySession session, string query)
         {
             string url = "/search?q=track:" + query + "&type=album,artist,playlist,track,show,episode&market=dk";
 
-            var response = await SendAPIRequest<Search>(user, "GET", url);
+            var response = await SendAPIRequest<Search>(session, "GET", url);
             return response;
         }
 
-        public async Task<(bool, Playlists, string)> GetCurrentUsersPlaylists(User user)
+        public async Task<(bool, Playlists, string)> GetCurrentUsersPlaylists(SpotifySession session)
         {
             string url = "/me/playlists";
 
             //var response = await SendAPIRequest<List<Playlist>>(user, "GET", url);
-            var response = await SendAPIRequest<Playlists>(user, "GET", url);
+            var response = await SendAPIRequest<Playlists>(session, "GET", url);
             return response;
         }
         
