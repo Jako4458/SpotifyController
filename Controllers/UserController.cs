@@ -28,16 +28,20 @@ namespace SpotifyController.Controllers
             string redirect_uri = stateQueries.Get("redirect_uri");
 
             if (error == null && code != null)
-                UserRepo.Users.Add(session_id, new User() { 
+            {
+                User newUser = new User()
+                {
                     SpotifySession = new SpotifySession()
                     {
                         Id = Guid.NewGuid().ToString(),
                         SpotifyToken = new SpotifyAPIToken(code, stateAsQueryString),
                         EndTime = DateTime.Now
                     },
-                    //spotifyAPIData = new SpotifyAPIToken(code, stateAsQueryString)
-                });
-                //UserRepo.TestUser.spotifyAPIData = new APIData(code, stateAsQueryString);
+                };
+
+                UserRepo.Users.Add(session_id, newUser);
+                //UserRepo.TestUser = newUser;
+            }
     
             if (stateAsQueryString != null)
                 return Redirect($"/API/SpotifyAPI/AccessToken?{stateAsQueryString}");

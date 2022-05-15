@@ -4,11 +4,16 @@
     border-radius: 5px;
     display: flex;
     overflow: hidden;
+    max-height: 84px;
 }
 
 .content .container .track p{
     margin-top: 20px;
     color: white;
+}
+
+.content .container .track img{
+    max-width: 64px;
 }
 
 .content .container .track #name{
