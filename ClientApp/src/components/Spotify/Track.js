@@ -33,6 +33,7 @@ export default class Track extends React.Component {
             headers: {
                 'Content-Type': 'application/json',
                 'SessionId': new Cookies().get("SessionId"),
+                'SpotifySessionId': this.props.SpotifySessionId,
             },
             body: JSON.stringify({"trackId": trackId}),
         });

@@ -29,7 +29,8 @@ export default class NavMenu extends React.PureComponent {
                 <a href={ `API/User/logout?session_id=${cookies.get("SessionId")}` }><li>Logout</li></a>
                 <a href="/Playlists"><li>Playlists</li></a>
                 <a href="/Search"><li>Search</li></a>
-                <a href="/Session"><li>Sessions</li></a>
+                <a href="/Sessions"><li>Sessions</li></a>
+                <a href={ `API/User/shareSession?session_id=${cookies.get("SessionId")}` }><li>Share</li></a>
             </ul>;
 
        let ContentLoggedOut = 
@@ -37,7 +38,7 @@ export default class NavMenu extends React.PureComponent {
                <a href={ `API/SpotifyAPI/authorize?session_id=${cookies.get("SessionId")}` }><li>Login</li></a>
                <a href="/Playlists"><li>Playlists</li></a>
                <a href="/Search"><li>Search</li></a>
-               <a href="/Session"><li>Sessions</li></a>
+               <a href="/Sessions"><li>Sessions</li></a>
             </ul>;
 
         let content = this.state.user == null ? ContentLoggedOut : ContentLoggedIn;

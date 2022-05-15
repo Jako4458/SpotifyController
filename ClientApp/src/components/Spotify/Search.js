@@ -13,8 +13,8 @@ export default class Search extends React.Component {
         let query = this.props.match.params.query;
         query = query ? query : "";
 
-        let session = this.props.match.params.sessionId;
-        this.session = session ? session : "";
+        let SpotifySessionId = this.props.match.params.sessionId;
+        this.SpotifySessionId = SpotifySessionId ? SpotifySessionId : "";
 
 
         this.state = {
@@ -33,7 +33,7 @@ export default class Search extends React.Component {
             ? <p>Loading ...</p>
             : this.state.search_result.tracks.items.map(element => {
                 let track = element;
-                return <Track id={track.id} name={track.name} album={track.album} duration_ms={track.duration_ms} />
+                return <Track id={track.id} name={track.name} album={track.album} duration_ms={track.duration_ms} SpotifySessionId={this.SpotifySessionId} />
             });
 
         return (
@@ -73,7 +73,7 @@ export default class Search extends React.Component {
             {
                 headers: {
                 'SessionId': sessionId,
-                'SpotifySessionId': this.session,
+                'SpotifySessionId': this.SpotifySessionId,
                 }
             })
         if (response.ok) {

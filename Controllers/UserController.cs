@@ -46,15 +46,15 @@ namespace SpotifyController.Controllers
         }
 
         [HttpGet]
-        public IActionResult ShareSession([FromHeader] string SessionId)
+        public IActionResult ShareSession([FromQuery] string session_id)
         {
             User user;
-            bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+            bool userFound = UserRepo.Users.TryGetValue(session_id, out user);
 
             if (!userFound)
                 return NotFound("User Not Found");
 
-            user.SpotifySession.EndTime.AddDays(1);
+            user.SpotifySession.EndTime = user.SpotifySession.EndTime.AddDays(1);
 
             SpotifySessionRepo.addPublicSpotifySession(user.SpotifySession);
             return Ok($"Session '{user.SpotifySession.Id}' is public the next 24 Hours");

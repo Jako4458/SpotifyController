@@ -22,7 +22,8 @@ namespace SpotifyController.Model
             set { _password = value; }
         }
 
-        public string Url { get; set; }
+        private string _baseUrl = "https://localhost";
+        public string Url => $"{_baseUrl}/session/{Id}/search";
         
     }
 }
