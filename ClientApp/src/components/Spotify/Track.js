@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Cookies from 'universal-cookie';
 
 import '../Template.css';
 import './Style.css';
@@ -6,16 +7,16 @@ import './Style.css';
 
 export default class Track extends React.Component {
 
-    constructor(props) {
-        super(props);
-        //this.state = {loading: true };
-    }
+    //constructor(props) {
+    //    super(props);
+    //    //this.state = {loading: true };
+    //}
 
     render() {
         return (
             <React.Fragment>
                 <div className="track" id={this.props.id}>
-                    <img src={this.props.album.images[2].url} />
+                    <img src={this.props.album.images[2].url} alt="album cover" />
                     <p id="name">{this.props.name}</p>
                     {this.RenderIfWidthIsOver(800, <p id="album">{this.props.album.name}</p>)}
                     {this.RenderIfWidthIsOver(800, <p id="artist">{this.props.album.artists.map(element => element.name)}</p>)}
@@ -30,7 +31,9 @@ export default class Track extends React.Component {
         const response = await fetch(`API/SpotifyAPI/QueueTrack?trackId=${this.props.id}`,{
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'SessionId': new Cookies().get("SessionId"),
+                'SpotifySessionId': this.props.SpotifySessionId,
             },
             body: JSON.stringify({"trackId": trackId}),
         });

@@ -1,11 +1,9 @@
 import * as React from 'react';
+import Cookies from 'universal-cookie';
 
 import '../Template.css';
 import PlaylistLink from './PlaylistLink';
 import './Style.css';
-
-import Track from './Track';
-
 
 export default class PlaylistOverview extends React.Component {
 
@@ -42,8 +40,15 @@ export default class PlaylistOverview extends React.Component {
         return (window.innerWidth > minWidth && component)
     }
 
-    async populatePlaylistOverview(path = null) {
-        const response = await fetch(path || `API/SpotifyAPI/GetPlaylists`);
+    async populatePlaylistOverview() {
+        let sessionId = new Cookies().get("SessionId");
+        const response = await fetch(`API/SpotifyAPI/GetPlaylists`,
+            {
+                headers: {
+                    'SessionId': sessionId,
+                }
+            }
+        );
         if (response.ok) {
             try {
                 const data = await response.json();
@@ -52,7 +57,7 @@ export default class PlaylistOverview extends React.Component {
                 this.setState({ playlists: { name: "Error: Response is not JSON!" }, loading: false });
             }
         } else if (response.status == 401) {
-            window.location.href = "API/SpotifyAPI/authorize?redirect_uri=/playlists"
+            window.location.href = `API/SpotifyAPI/authorize?session_id=${sessionId}&redirect_uri=/playlists`
         } else {
             this.setState({ playlists: { name: `Error: ${response.status}: ${response.body}` }, loading: false });
         }

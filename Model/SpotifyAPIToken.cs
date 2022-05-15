@@ -2,9 +2,9 @@
 
 namespace SpotifyController.Model
 {
-    public class APIData
+    public class SpotifyAPIToken
     {
-        public APIData(string code, string status)
+        public SpotifyAPIToken(string code, string status)
         {
             Code = code;
             Status = status;
