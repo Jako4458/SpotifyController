@@ -23,7 +23,7 @@ export default class Playlist extends React.Component {
             ? <p>Loading ...</p>
             : this.state.playlist.tracks.items.map(element => {
                 let track = element.track;
-                return <Track id={track.id} name={track.name} album={track.album} duration_ms={track.duration_ms} />
+                return <Track id={track.id} name={track.name} album={track.album} duration_ms={track.duration_ms} SpotifySessionId={""} />
             });
 
         return (

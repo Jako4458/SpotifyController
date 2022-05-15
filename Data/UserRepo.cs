@@ -8,8 +8,8 @@ namespace SpotifyController.Data
 {
     static public class UserRepo
     {
-        static public User TestUser = new User { Name = "Test" };
-
         static public Dictionary<string, User> Users = new Dictionary<string, User>();
+
+        static public User TestUser { get; set; }
     }
 }

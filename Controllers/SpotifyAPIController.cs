@@ -30,7 +30,8 @@ namespace LogenV2React.Controllers
         [HttpGet]
         public async Task<IActionResult> AccessToken([FromQuery] string session_id, [FromQuery] string redirect_uri="/")
         {
-            //User user = UserRepo.TestUser;
+            if (session_id == null)
+                return Unauthorized("Invalid Session!");
 
             User user;
             bool UserFound = UserRepo.Users.TryGetValue(session_id, out user);
@@ -52,6 +53,8 @@ namespace LogenV2React.Controllers
         [HttpPost]
         public async Task<IActionResult> QueueTrack([FromHeader] string SessionId, [FromHeader] string SpotifySessionId, [FromQuery] string trackId, [FromQuery] bool raw=false)
         {
+            if (SessionId == null)
+                return Unauthorized("Invalid Session!");
             if (trackId == null)
                 return NotFound("No trackId supplied!");
 
@@ -67,7 +70,7 @@ namespace LogenV2React.Controllers
 
                 if (!userFound)
                     return Unauthorized("Not connected to spotify");
-                else if (SpotifySessionId is null || SpotifySessionId == "" || user.SpotifySession.Id == SpotifySessionId)
+                else if (SpotifySessionId is null || SpotifySessionId == "" || SpotifySessionId == "undefined"  || user.SpotifySession.Id == SpotifySessionId)
                 {
                     sessionFound = true;
                     spotifySession = user.SpotifySession;
@@ -100,6 +103,9 @@ namespace LogenV2React.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPlaylists([FromHeader] string SessionId, [FromQuery] bool raw=false)
         {
+            if (SessionId == null)
+                return Unauthorized("Invalid Session!");
+
             User user;
             bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
 
@@ -130,11 +136,16 @@ namespace LogenV2React.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPlaylist([FromHeader] string SessionId, [FromQuery] string playlistId, [FromQuery] bool raw = false)
         {
+            if (SessionId == null)
+                return Unauthorized("Invalid Session!");
             if (playlistId == null)
                 return NotFound("No playlistId supplied!");
 
             User user;
-            bool userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+            bool userFound;
+
+            userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+
 
             if (!userFound)
                 return Unauthorized("Not connected to spotify");
@@ -162,6 +173,8 @@ namespace LogenV2React.Controllers
 
         public async Task<IActionResult> Search([FromHeader] string SessionId, [FromHeader] string SpotifySessionId, [FromQuery] string query, [FromQuery] bool raw = false)
         {
+            if (SessionId == null)
+                return Unauthorized("Invalid Session!");
             if (query == null)
                 return NotFound("No search query found");
             
@@ -177,7 +190,7 @@ namespace LogenV2React.Controllers
 
                 if (!userFound)
                     return Unauthorized("Not connected to spotify");
-                else if (SpotifySessionId is null || SpotifySessionId == "" || user.SpotifySession.Id == SpotifySessionId)
+                else if (SpotifySessionId is null || SpotifySessionId == "" || SpotifySessionId == "undefined"  || user.SpotifySession.Id == SpotifySessionId)
                 {
                     sessionFound = true;
                     spotifySession = user.SpotifySession;
