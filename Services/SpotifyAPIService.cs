@@ -167,7 +167,15 @@ namespace SpotifyController.Services
             var response = await SendAPIRequest<Playlist>(session, "GET", url);
             return response;
         }
-        
+
+         public async Task<(bool, PlaylistTracks, string)> GetPlaylistTracks(SpotifySession session, string playlistId, int offset=0, int limit=20)
+        {
+            string url = $"/playlists/{playlistId}/tracks?offset={offset}&limit={limit}";
+
+            var response = await SendAPIRequest<PlaylistTracks>(session, "GET", url);
+            return response;
+        }       
+
         public async Task<(bool, Track, string)> GetTrack(SpotifySession session, string trackId)
         {
             string url = $"/tracks/{trackId}";

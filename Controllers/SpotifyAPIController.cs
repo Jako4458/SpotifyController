@@ -171,6 +171,45 @@ namespace LogenV2React.Controllers
             return Ok(playlist);
         }
 
+         [HttpGet]
+        public async Task<IActionResult> GetPlaylistTracks([FromHeader] string SessionId, [FromQuery] string playlistId, [FromQuery] int offset=0, [FromQuery] int limit=20, [FromQuery] bool raw = false)
+        {
+            if (SessionId == null)
+                return Unauthorized("Invalid Session!");
+            if (playlistId == null)
+                return NotFound("No playlistId supplied!");
+
+            User user;
+            bool userFound;
+
+            userFound = UserRepo.Users.TryGetValue(SessionId, out user);
+
+
+            if (!userFound)
+                return Unauthorized("Not connected to spotify");
+            
+            bool succesfullyAdded;
+            PlaylistTracks playlistTracks;
+            string responseContent;
+
+            try
+            {
+                (succesfullyAdded, playlistTracks, responseContent) = await _spotifyAPIService.GetPlaylistTracks(user.SpotifySession, playlistId, offset, limit);
+            }
+            catch (SpotifyNotConnectedException)
+            {
+                return Unauthorized(new {Message = "Not Connected to spotify!"});
+            }
+
+            if (!succesfullyAdded)
+                return NotFound("Playlist could not be found!");
+            if (raw) 
+                return Ok(responseContent);
+            
+            return Ok(playlistTracks);
+        }
+
+
         public async Task<IActionResult> Search([FromHeader] string SessionId, [FromHeader] string SpotifySessionId, [FromQuery] string query, [FromQuery] bool raw = false)
         {
             if (SessionId == null)

@@ -230,3 +230,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+Properties/serviceDependencies.json
+Properties/serviceDependencies.local.json
+.config/dotnet-tools.json
