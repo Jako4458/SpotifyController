@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import '../Template.css';
 import './Style.css';
@@ -14,12 +15,12 @@ export default class PlaylistLink extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <a href={"/playlist/" + this.props.id}>
+                <Link to={"/playlist/" + this.props.id}>
                     <div className="playlistLink" id={this.props.id}>
                         <img src={this.props.imageUrl} alt="platlist cover" />
                         <p id="name">{this.props.name}</p>
                     </div>
-                </a>
+                </Link>
             </React.Fragment>
         );
     }

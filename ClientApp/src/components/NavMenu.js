@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import './Template.css';
-//import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
-//import { Link } from 'react-router-dom';
+import uuid from "uuid";
 
 export default class NavMenu extends React.PureComponent {
-    state = {
-        isOpen: false,
-    };
+    //state = {
+    //    isOpen: false,
+    //};
 
     constructor(props) {
         super(props);
@@ -16,29 +15,48 @@ export default class NavMenu extends React.PureComponent {
     }
 
     componentDidMount() {
-        this.getUserDataFromSessionId();
+        this.getUserDataFromSessionId()
+            .then(() => {
+                if (this.state.user != null) {
+                    let cookies = new Cookies();
+                    let sharelink = document.querySelector("#shareLink");
+
+                    sharelink.addEventListener("click", () => {
+                        sharelink.style.display = "none";
+                        fetch(`API/User/shareSession?session_id=${cookies.get("SessionId")}`)
+                    })
+                }
+            })
     }
 
 
     render() {
         let cookies = new Cookies();
 
+        const refreshSessionsOnShare = {
+            pathname: "/Sessions",
+            key: uuid(), // we could use Math.random, but that's not guaranteed unique.
+            state: {
+                applied: true
+            }
+        };
+
         let ContentLoggedIn = 
             <ul>
                 {/*<Link to>Logout</Link>*/}
                 <a href={ `API/User/logout?session_id=${cookies.get("SessionId")}` }><li>Logout</li></a>
-                <a href="/Playlists"><li>Playlists</li></a>
-                <a href="/Search"><li>Search</li></a>
-                <a href="/Sessions"><li>Sessions</li></a>
-                <a href={ `API/User/shareSession?session_id=${cookies.get("SessionId")}` }><li>Share</li></a>
+                <Link to="/Playlists"><li>Playlists</li></Link>
+                <Link to="/Search"><li>Search</li></Link>
+                <Link to="/Sessions"><li>Sessions</li></Link>
+                <Link to={refreshSessionsOnShare} id="shareLink"><li>Share</li></Link>
             </ul>;
 
        let ContentLoggedOut = 
              <ul>
-               <a href={ `API/SpotifyAPI/authorize?session_id=${cookies.get("SessionId")}` }><li>Login</li></a>
-               <a href="/Playlists"><li>Playlists</li></a>
-               <a href="/Search"><li>Search</li></a>
-               <a href="/Sessions"><li>Sessions</li></a>
+               <a href={ `API/SpotifyAPI/authorize?session_id=${cookies.get("SessionId")}` } id="login"><li>Login</li></a>
+               <Link to="/Playlists"><li>Playlists</li></Link>
+               <Link to="/Search"><li>Search</li></Link>
+               <Link to="/Sessions"><li>Sessions</li></Link>
             </ul>;
 
         let content = this.state.user == null ? ContentLoggedOut : ContentLoggedIn;
@@ -60,7 +78,6 @@ export default class NavMenu extends React.PureComponent {
                 headers: {
                     'SessionId': new Cookies().get("SessionId"),
                 },
-
             }
         );
         if (response.ok) {
